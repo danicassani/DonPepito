@@ -1,54 +1,82 @@
 import discord
-from discord import app_commands
+
+from discord.ext import commands
+from Usuario import User
+from dbusers import dbusers
 import pytz
-# from discord.ext.commands import Bot
-# from discord.ext import commands
 
+##CONSTANTES
 guild_id = 630135300131127320
-
-class aclient(discord.Client):
-    def __init__(self):
-        super().__init__(intents=discord.Intents.default())
-        self.synced = False
-    async def on_ready(self):
-        await self.wait_until_ready()
-        if not self.synced:
-            await tree.sync(guild = discord.Object(id = guild_id))#guild = discord.Object(id = guild_id)
-            self.synced = True
-        print(f'Logged in as {self.user}')
+users_path = 'database.db'
+intents = discord.Intents.default()
+intents.message_content = True
+bot = discord.Bot(intents=intents)
 
 
+# dbu.crear_tabla_usuarios(users_path)
 
-client = aclient()
-
-tree = app_commands.CommandTree(client)
-@tree.command(name="test", description="testing", guild = discord.Object(id = guild_id) )
-async def test(interaction: discord.Interaction, name: str):
-    await interaction.response.send_message(f'Hello {name}! I was made with Discord.py!')
-# intents = discord.Intents.default()
-# intents.message_content = True
-
-# bot = Bot(command_prefix = "/", intents = intents)
-
-spain_tz = pytz.timezone('Europe/Madrid')
-
-# #PRINTS IN CONSOLE ALL MESSAGES. JUST FOR DEBUG
-@client.event
-async def on_message(interaction: discord.Interaction):
-
-    if interaction.author == client.user:
+@bot.event
+async def on_message(ctx: discord.Message):
+    if ctx.author == bot.user:
         return
-    dt = interaction.created_at
+    print(f'[{timestamp(ctx.created_at)}] {ctx.author}: {ctx.content}')
+
+
+
+#SISTEMAS INICIALIZADOS
+dbu = dbusers(users_path)
+
+
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user}")
+
+#SLASH COMMANDS
+
+###BOTONES
+class MyView(discord.ui.View): # Create a class called MyView that subclasses discord.ui.View
+    @discord.ui.button(label="Click me!", style=discord.ButtonStyle.primary, emoji="😎") # Create a button with the label "😎 Click me!" with color Blurple
+    async def button_callback(self, button, interaction):
+        await interaction.response.send_message("You clicked the button!") # Send a message when the button is clicked
+
+@bot.slash_command() # Create a slash command
+async def button(ctx):
+    await ctx.respond("This is a button!", view=MyView()) # Send a message with our View class that contains the button
+####
+
+@bot.slash_command(guild_ids=[guild_id])
+async def pito(ctx: discord.ApplicationContext):
+    await ctx.respond("Piii!") 
+
+@bot.slash_command(guild_ids = [guild_id])
+async def usuario(ctx: discord.ApplicationContext):
+    user = User(ctx.author.id, ctx.author.name)
+    dbu.insertar_usuario(usuario = user)
+    await ctx.respond(user.toString());
+
+@bot.slash_command(guild_ids = [guild_id])
+async def select(ctx: discord.ApplicationContext): 
+    dbu.seleccionar_usuario(ctx.author.id)
+    await ctx.respond("selected")
+
+
+##FUNCIONES PROPIAS
+def timestamp(dt): 
+    #CONVIERTE una variable de tipo datetime.datetime 
+    #en un string con formato dd-mm-yy HH:MM:SS.
+    spain_tz = pytz.timezone('Europe/Madrid')
     dt_tz = dt.astimezone(spain_tz)
     timestamp = dt_tz.strftime('%d-%m-%y %H:%M:%S')
-    print(f'[{timestamp}] {interaction.author}: {interaction}')
+    return timestamp
 
+# #PRINTS IN CONSOLE ALL MESSAGES. JUST FOR DEBUG
+@bot.event
+async def on_message(ctx: discord.Message):
+    if ctx.author == bot.user:
+        return
+    print(f'[{timestamp(ctx.created_at)}] {ctx.author}: {ctx.content}')
 
-# @bot.slash_command()
-# async def test(ctx):
-#     await ctx.reply("Piiii")
-
+##SAFE TOKEN & RUN
 f = open("token", "r")
 token = f.read()
-# bot.run(token)
-client.run(token)
+bot.run(token)
