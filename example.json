@@ -1,0 +1,23 @@
+{
+	"id": 1234567890,
+	"name": "Don Pito",
+	"points": 1431,
+	"interval": {
+		"current level": 6,
+		"levels": 
+		{
+		"1": {"performance": 1.00, "attempts": 25},
+		"2": {"performance": 0.87, "attempts": 37}
+	 	}
+	},
+	"absolute": {
+		"current level": 5,
+		"levels": 
+		{
+			"1": {"performance": 1.00, "attempts": 25}
+		}
+	},
+	"frequency": {"idem": "idem"},
+	"equalization": {"idem": "idem"}
+}
+

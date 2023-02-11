@@ -16,27 +16,46 @@ class dbusers():
             nivel_intervalica text
         )
         ''')
-        # Commit the changes
-        conn.commit()
 
-        # Close the connection
+        conn.commit()
         conn.close()
+
+    def print_columnas(self):
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        a = cursor.execute("PRAGMA table_info(tabla_usuarios)").fetchall()
+        conn.close()
+        return a
 
     def insertar_usuario(self, usuario: User):
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute(f'''INSERT INTO tabla_usuarios (nombre, id, exp, nivel_intervalica)
-        VALUES ({usuario.name}, {usuario.id}, {usuario.exp}, {usuario.intervalic_level})''')
-        # Commit the changes
+        #Is the user already registered?
+        already_registered = cursor.execute(f'SELECT EXISTS (SELECT 1 FROM tabla_usuarios WHERE id={usuario.id} LIMIT 1)').fetchone()[0] == 1
+        if already_registered:
+            success = False
+        else:    
+            query = f'''INSERT INTO tabla_usuarios (nombre, id, exp, nivel_intervalica)
+            VALUES ('{usuario.name}', '{usuario.id}', {usuario.exp}, '{usuario.intervalic_level}')'''
+            cursor.execute(query)
+            success = True
         conn.commit()
-        # Close the connection
         conn.close()
+        
+        return success
 
     def seleccionar_usuario(self, id):
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        a = cursor.execute(f"SELECT * FROM tabla_usuarios WHERE id = {id}")
-        print(a.fetchall())
+        a = cursor.execute(f"SELECT * FROM tabla_usuarios WHERE id = {id}").fetchall()
+        return a
+
+    def mostrar_todo(self):
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        a = cursor.execute(f"SELECT * FROM tabla_usuarios").fetchall()
+        print(a)
+
 
 
 

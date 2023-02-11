@@ -11,9 +11,8 @@ users_path = 'database.db'
 intents = discord.Intents.default()
 intents.message_content = True
 bot = discord.Bot(intents=intents)
+dbu = dbusers(users_path)
 
-
-# dbu.crear_tabla_usuarios(users_path)
 
 @bot.event
 async def on_message(ctx: discord.Message):
@@ -23,9 +22,6 @@ async def on_message(ctx: discord.Message):
 
 
 
-#SISTEMAS INICIALIZADOS
-dbu = dbusers(users_path)
-
 
 @bot.event
 async def on_ready():
@@ -33,38 +29,11 @@ async def on_ready():
 
 #SLASH COMMANDS
 
-###BOTONES
-boton1 = Button(label="Primary", style=discord.ButtonStyle.primary)
-async def boton1_callback(interaction: discord.Interaction):
-   await interaction.response.send_message("Botón primario!")
-boton1.callback = boton1_callback
 
-boton2 = Button(label="Secondary", style=discord.ButtonStyle.secondary)
-async def boton2_callback(interaction: discord.Interaction):
-   await interaction.response.send_message("Botón secundario!")
-boton2.callback = boton2_callback
-
-boton3 = Button(label="Danger", style=discord.ButtonStyle.danger)
-async def boton3_callback(interaction: discord.Interaction):
-   await interaction.response.send_message("CUIDADO!!")
-boton3.callback = boton3_callback
-
-
-async def select_tortilla(interaction: discord.Interaction):
-    seleccion = interaction.data["values"][0]
-    await interaction.response.send_message("Tortilla seleccionada. " + seleccion)
 
 # CREAR CLASE VIEW
-@bot.slash_command() # Create a slash command
-async def tortilla(ctx: discord.ApplicationContext):
-    seleccionable = Select(placeholder="Selecciona una opción:", options=[
-    discord.SelectOption(label="Con cebolla", emoji="👍",description="La opción correcta."),
-    discord.SelectOption(label="Sin cebolla", emoji="👎",description="Eres un monstruo.") ])
 
-    view = View(seleccionable)
-    seleccionable.callback = select_tortilla
-    await ctx.respond("La tortilla, ¿con cebolla o sin cebolla?", view = view)
-
+#EJEMPLO DE MODAL Y DE MENSAJE TIPO EMBED
 class MyModal(discord.ui.Modal):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -78,17 +47,16 @@ class MyModal(discord.ui.Modal):
         embed.add_field(name="Long Input", value=self.children[1].value)
         await interaction.response.send_message(embeds=[embed])
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[guild_id])
 async def modal(ctx: discord.ApplicationContext):
     """Shows an example of a modal dialog being invoked from a slash command."""
     modal = MyModal(title="Modal via Slash Command")
     await ctx.send_modal(modal)
-
-@bot.slash_command() # Create a slash command
-async def button(ctx):  
-    view = View(boton1, boton2, boton3)
-    await ctx.respond("Theese are some buttons!", view=view) # Send a message with our View class that contains the button
-####
+  
+""" 
+@bot.slash_command(guild_ids=[guild_id])
+async def inscribirme(ctx: discord.ApplicationContext):
+    print() """
 
 
 @bot.slash_command(guild_ids=[guild_id])
@@ -99,10 +67,7 @@ async def pito(ctx: discord.ApplicationContext):
 async def usuario(ctx: discord.ApplicationContext):
     user = User(ctx.author.id, ctx.author.name)
     dbu.insertar_usuario(usuario = user)
-    await ctx.respond(user.toString());
-
-
-
+    await ctx.respond(user.toString())
 
 @bot.slash_command(guild_ids = [guild_id])
 async def dbuselect(ctx: discord.ApplicationContext): 
