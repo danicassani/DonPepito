@@ -29,7 +29,7 @@ pipeline
                 {
                     println("Creando archivo...")
                     full_path = path + "\\" + filename
-                    writeFile(file: full_path, content: age_string)
+                    writeFile(file: full_path, text: age_string)
                 }
             }
         }
