@@ -1,3 +1,4 @@
+year = 1995
 pipeline
 {
     agent any
@@ -7,7 +8,13 @@ pipeline
         {
             steps
             {
-                echo "Hola desde Github. Commit nuevo 2"
+                script
+                {
+                    fecha = new Date()
+                    current_year = fecha.getYear()
+                    age = current_year - year
+                    println("Tienes ${age} años")
+                }
             }
         }
     }
