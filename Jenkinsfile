@@ -14,7 +14,7 @@ pipeline
                 script
                 {
                     fecha = new Date()
-                    current_year = fecha.getYear()
+                    current_year = fecha.getYear() + 1900
                     age = current_year - year
                     age_string = "Tienes ${age} años"
                     println(age_string)
