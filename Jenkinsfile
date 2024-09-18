@@ -7,7 +7,7 @@ pipeline
         {
             steps
             {
-                echo "Hola desde Github. Commit nuevo"
+                echo "Hola desde Github. Commit nuevo 2"
             }
         }
     }
