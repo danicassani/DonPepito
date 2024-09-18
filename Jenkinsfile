@@ -9,7 +9,7 @@ pipeline
             {
                 script
                 {
-                
+                    echo "Hola desde Github"
                 }
             }
         }
